@@ -12,7 +12,7 @@
  *  - average landing and take-off waiting times, and average run-way idle time.
  * 
  *
- * @author Akhil Kokani <akhilkokani@gmail.com>
+ * @author Akhil Kokani
  * @package Airport Simulator
  */
 
