@@ -8,8 +8,7 @@
  * Number of planes waiting to take off or land should not exceed a certain fixed limit.
  * Landing planes should have high priority than Taking-off plane. 
  * After running for some period, the program should print statistics such as: 
- *  - number of planes processed, 
- *  - landed, and took off, refused; 
+ *  - number of planes processed, landed, and took off, refused; 
  *  - average landing and take-off waiting times, and average run-way idle time.
  * 
  *
@@ -24,16 +23,19 @@
 #include <time.h>
 #include <limits.h>
 
+// Constants
 #define MAX 3
 #define ARRIVE 0
 #define DEPART 1
 
+// Type definition for plane (aeroplane)
 typedef struct flyingMachine {
   
   int id;
   int tm;
 } plane;
 
+// Type deifnition for Circular Queue
 typedef struct qyu {
 
   int count;
@@ -42,7 +44,9 @@ typedef struct qyu {
   plane p[MAX];
 } queue;
 
+// Type definition for airport
 typedef struct aerport {
+
   queue landing;
   queue takeoff;
   queue *pl;
@@ -53,6 +57,7 @@ typedef struct aerport {
   plane pln;
 } airport;
 
+// Prototypes of functions used
 void initqueue ( queue * );
 void addqueue ( queue *, plane );
 plane delqueue ( queue * );
@@ -75,6 +80,7 @@ int apfull ( airport, char );
 int apempty ( airport, char );
 void myrandomize ( );
 
+// Used to initliase queue with its default values
 void initqueue ( queue *pq ) {
 
   pq->count = 0;
@@ -82,6 +88,7 @@ void initqueue ( queue *pq ) {
   pq->rear = -1;
 }
 
+// Used to add elements in the queue
 void addqueue ( queue *pq, plane item ) {
 
   if ( pq->count >= MAX ) {
@@ -94,6 +101,7 @@ void addqueue ( queue *pq, plane item ) {
   pq->p[pq->rear] = item;
 }
 
+// Used to delete element from given queue
 plane delqueue ( queue *pq ) {
   
   plane p1;
@@ -115,18 +123,22 @@ plane delqueue ( queue *pq ) {
   return p1;
 }
 
+// Determines size of given queue
 int size ( queue q ) {
   return q.count;
 }
 
+// Determines whether given is empty or not
 int empty ( queue q ) {
   return ( q.count <= 0 );
 }
 
+// Determines whether given queue is full or not
 int full ( queue q ) {
   return ( q.count >= MAX );
 }
 
+// Initialises airport with its default values
 void initairport ( airport *ap ) {
 
   initqueue ( &( ap-> landing ) );
@@ -137,6 +149,8 @@ void initairport ( airport *ap ) {
   ap->landwait = ap->takeoffwait = ap->idletime = 0;
 }
 
+// Used to ask inputs from user about expected arrivals at airport and departs, 
+// and seeding for random generator
 void start ( int *endtime, double *expectarrive, double *expectdepart ) {
   
   int flag = 0;
@@ -177,6 +191,7 @@ void start ( int *endtime, double *expectarrive, double *expectdepart ) {
   } while ( flag == 0 );
 }
 
+// Used to add new plane to given airport
 void newplane ( airport *ap, int curtime, int action ) {
   
   ap->nplanes += 1;
@@ -195,21 +210,22 @@ void newplane ( airport *ap, int curtime, int action ) {
   }
 }
 
+// Used to refuse an plane landing in airport or departing from airport
 void refuse ( airport *ap, int action ) {
+
   switch ( action ) {
     case ARRIVE :
-
-       printf ( "\tplane  %d directed to another airport.\n", ap->pln.id );
-       break;
+      printf ( "\tplane  %d directed to another airport.\n", ap->pln.id );
+      break;
 
     case DEPART :
-
-       printf ( "\tplane %d told to try later.\n", ap->pln.id );
-       break;
+      printf ( "\tplane %d told to try later.\n", ap->pln.id );
+      break;
   }
   ap->nrefuse += 1;
 }
 
+// Used to land given plane in given airport
 void land ( airport *ap, plane pl, int curtime ) {
   int wait;
 
@@ -220,6 +236,7 @@ void land ( airport *ap, plane pl, int curtime ) {
   ap->landwait += wait;
 }
 
+// Used to takeoff given plane in given airport
 void fly ( airport *ap, plane pl, int curtime ) {
   
   int wait;
@@ -230,12 +247,15 @@ void fly ( airport *ap, plane pl, int curtime ) {
   ap->takeoffwait += wait;
 }
 
+// Used to indicate given airport is idle
 void idle ( airport *ap, int curtime ) {
 
   printf ( "%d: Runway is idle.\n", curtime );
   ap->idletime++;
 }
 
+// Used to display stats such as, total number of planes processed 
+// and all other given in problem statement
 void conclude ( airport *ap, int endtime ) {
 
   printf ( "\tSimulation has concluded after %d units.\n", endtime );
@@ -256,6 +276,7 @@ void conclude ( airport *ap, int endtime ) {
     printf ( "\tAverage wait time to take off: %lf \n", ( ( double ) ap->takeoffwait / ap->ntakeoff ) );
 }
 
+// Used to generate number
 int randomnumber ( double expectedvalue ) {
   int n = 0;
   double em;
@@ -272,6 +293,7 @@ int randomnumber ( double expectedvalue ) {
   return n;
 }
 
+// Used to add element in airport's queue
 void apaddqueue ( airport *ap, char type ) {
 
   switch ( tolower( type ) ) {
@@ -285,6 +307,7 @@ void apaddqueue ( airport *ap, char type ) {
   }
 }
 
+// Used to delete element in airport's queue
 plane apdelqueue ( airport *ap, char type ) {
   plane p1;
 
@@ -301,6 +324,7 @@ plane apdelqueue ( airport *ap, char type ) {
   return p1;
 }
 
+// Used to calculate size of given airport, of given type
 int apsize ( airport ap, char type ) {
 
   switch ( tolower ( type ) ) {
@@ -314,6 +338,7 @@ int apsize ( airport ap, char type ) {
   return 0;
 }
 
+// Used to determine whether given type in given airport is full or not
 int apfull ( airport ap, char type ) {
 
   switch ( tolower ( type ) ) {
@@ -323,41 +348,47 @@ int apfull ( airport ap, char type ) {
     case 't' :
         return ( full ( *( ap.pt ) ) );
   }
-
   return 0;
 }
 
+// Used to determine whether given airport is empty or not
 int apempty ( airport ap, char type ) {
 
-  switch ( tolower ( type ) ) {
+  switch ( tolower(type) ) {
+
     case 'l' :
-        return ( empty ( *( ap.pl ) ) );
+      return ( empty ( *( ap.pl ) ) );
 
     case 't' :
-        return ( empty ( *( ap.pt ) ) );
+      return ( empty ( *( ap.pt ) ) );
   }
-
   return 0;
 }
 
+// Used to initialise seed for rand()
 void myrandomize( ) {
   srand ( ( unsigned int ) ( time ( NULL ) % 10000 ) );
 }
 
-int main( ) {
+int main ( ) {
+
   airport a;
-  int i, pri, curtime, endtime;
-  double expectarrive, expectdepart;
   plane temp;
 
+  int i, pri, curtime, endtime;
+  double expectarrive, expectdepart;
+
+  // Intialising airport
   initairport ( &a );
 
+  // Asking input from user
   start ( &endtime, &expectarrive, &expectdepart );
 
+  // Untill units of time is complete
   for ( curtime = 1; curtime <= endtime; curtime++ ) {
 
+    // Random number
     pri = randomnumber ( expectarrive );
-    printf("pri is %d\n", pri);
 
     for ( i = 1; i <= pri; i++ ) {
 
@@ -369,6 +400,7 @@ int main( ) {
     }
 
     pri = randomnumber ( expectdepart );
+
     for ( i = 1; i <= pri; i++ ) {
 
       newplane ( &a, curtime, DEPART );
@@ -394,6 +426,7 @@ int main( ) {
     }
   }
 
+  // Conclude by showing stats to user.
   conclude ( &a, endtime );
   return 0;
 }
